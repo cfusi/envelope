@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>com.cloudera.labs.envelope</groupId>
   <artifactId>envelope-parent</artifactId>
   <version>0.5.0</version>
   <packaging>pom</packaging>
-  
+
   <inceptionYear>2016</inceptionYear>
   <description>Envelope is an Apache Spark application framework for implementing streaming and batch data pipelines on a CDH cluster.</description>
   <url>https://github.com/cloudera-labs/envelope</url>
@@ -28,7 +28,7 @@
       <organizationUrl>http://www.cloudera.com</organizationUrl>
     </developer>
   </developers>
-  
+
   <modules>
     <module>core</module>
     <module>lib</module>
@@ -39,10 +39,10 @@
     <module>examples</module>
     <module>build/envelope</module>
   </modules>
-  
+
   <properties>
     <scala.version>2.11</scala.version>
-    <spark.version>2.2.0.cloudera2</spark.version>
+    <spark.version>2.3.0.cloudera2</spark.version>
     <kafka.version>0.10.0-kafka-2.1.0</kafka.version>
     <kudu.version>1.4.0-cdh5.12.0</kudu.version>
     <hbase.version>1.2.0-cdh5.7.0</hbase.version>
@@ -57,14 +57,14 @@
     <curator.version>2.12.0</curator.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <repositories>
     <repository>
       <id>cloudera</id>
       <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
     </repository>
   </repositories>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.spark</groupId>
@@ -132,7 +132,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>

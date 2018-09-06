@@ -39,22 +39,28 @@ import com.typesafe.config.ConfigFactory;
 import scala.Option;
 
 public class KuduServiceCredentialProvider implements ServiceCredentialProvider {
-  
+
   public static final String CREDENTIAL_ALIAS_PREFIX = "envelope.kudu.";
   public static final String ENVELOPE_CONFIGURATION_CONF = "envelope.configuration";
   public static final String KUDU_MASTER_ADDRESSES_CONF = "spark.kudu.master.addresses";
-  
+
   private static Logger LOG = LoggerFactory.getLogger(KuduServiceCredentialProvider.class);
 
-  @Override
+/*  @Override
   public boolean credentialsRequired(SparkConf sparkConf, Configuration conf) {
+    return UserGroupInformation.isSecurityEnabled();
+  } */
+
+  // SPARK - Since version 2.3 the method signature changed
+  @Override
+  public boolean credentialsRequired(Configuration hadoopConf) {
     return UserGroupInformation.isSecurityEnabled();
   }
 
   @Override
   public Option<Object> obtainCredentials(Configuration conf, SparkConf sparkConf, Credentials creds) {
     Set<String> masterAddresseses = getAllKuduMasterAddresses(sparkConf);
-    
+
     for (String masterAddresses : masterAddresseses) {
       byte[] token;
       try {
@@ -65,14 +71,14 @@ public class KuduServiceCredentialProvider implements ServiceCredentialProvider 
       catch (KuduException e) {
         throw new RuntimeException(e);
       }
-      
+
       Text credAlias = new Text(CREDENTIAL_ALIAS_PREFIX + masterAddresses);
       Token<?> credToken = new Token<>(null, token, new Text("auth"), new Text("envelope-kudu"));
       creds.addToken(credAlias, credToken);
-      
+
       LOG.info("Kudu authentication credentials obtained for master addresses: " + masterAddresses);
     }
-    
+
     return Option.empty();
   }
 
@@ -80,34 +86,34 @@ public class KuduServiceCredentialProvider implements ServiceCredentialProvider 
   public String serviceName() {
     return "envelope-kudu";
   }
-  
+
   private Set<String> getAllKuduMasterAddresses(SparkConf sparkConf) {
     // This configuration will only be available in client mode, but is automatically populated by Envelope.
     if (sparkConf.contains(ENVELOPE_CONFIGURATION_CONF)) {
       String envelopeString = sparkConf.get(ENVELOPE_CONFIGURATION_CONF);
       Config envelopeConfig = ConfigFactory.parseString(envelopeString);
-      
+
       Set<String> masterAddresseses = Sets.newHashSet();
-      
+
       Set<String> stepNames = envelopeConfig.getObject("steps").keySet();
       for (String stepName : stepNames) {
         Config stepConfig = envelopeConfig.getConfig("steps").getConfig(stepName);
-        
+
         if (stepConfig.hasPath("output")) {
           Config outputConfig = stepConfig.getConfig("output");
-          
+
           if (outputConfig.getString("type").equals("kudu")) {
             masterAddresseses.add(outputConfig.getString("connection"));
           }
         }
       }
-      
+
       return masterAddresseses;
     }
     // This configuration is available in all modes, but has to be manually provided by the user.
     else if (sparkConf.contains(KUDU_MASTER_ADDRESSES_CONF)) {
       String masterAddressesConf = sparkConf.get(KUDU_MASTER_ADDRESSES_CONF);
-      
+
       return Sets.newHashSet(masterAddressesConf.split(Pattern.quote(";")));
     }
     // If neither of the above configurations are available then we assume the job is not using the
@@ -116,5 +122,5 @@ public class KuduServiceCredentialProvider implements ServiceCredentialProvider 
       return Sets.newHashSet();
     }
   }
-  
+
 }
