@@ -118,10 +118,9 @@ public class CsvDeriver implements Deriver, ProvidesAlias {
         Dataset<String> input;
 
         if (dependencies.size() == 1) {
-            LOG.info("derive :dependency = " + dependencies.values().iterator().next());
-            // input = dependencies.values().iterator().next().select(csvColumn).as(Encoders.bean(String.class));
+            LOG.debug("derive :dependency = " + dependencies.values().iterator().next());
             input = dependencies.values().iterator().next().select(csvColumn).withColumnRenamed(csvColumn, "value").as(Encoders.STRING());
-            LOG.info("derive : after transformation. Final input dataset schema: " + input.schema().treeString());
+            LOG.debug("derive : after transformation. Final input dataset schema: " + input.schema().treeString());
             input.show(); // REMOVE AFTER TEST
         } else if ( !dataset.isEmpty() ) {
             input = dependencies.get(dataset).withColumnRenamed(csvColumn, "value").as(Encoders.STRING());
@@ -130,12 +129,11 @@ public class CsvDeriver implements Deriver, ProvidesAlias {
         }
 
         if (null != schema) {
-            LOG.info("derive : schema = " + schema.treeString());
+            LOG.debug("derive : schema = " + schema.treeString());
             result =  Contexts.getSparkSession().read().schema(schema).options(options).csv(input);
-            LOG.info("derive : result schema = " + result.schema().treeString());
+            LOG.debug("derive : result schema = " + result.schema().treeString());
             result.show();
         } else {
-            LOG.info("derive : schema is null" );
             result =  Contexts.getSparkSession().read().options(options).csv(input);
         }
 
