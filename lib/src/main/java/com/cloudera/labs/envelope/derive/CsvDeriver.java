@@ -121,7 +121,6 @@ public class CsvDeriver implements Deriver, ProvidesAlias {
             LOG.debug("derive :dependency = " + dependencies.values().iterator().next());
             input = dependencies.values().iterator().next().select(csvColumn).withColumnRenamed(csvColumn, "value").as(Encoders.STRING());
             LOG.debug("derive : after transformation. Final input dataset schema: " + input.schema().treeString());
-            input.show(); // REMOVE AFTER TEST
         } else if ( !dataset.isEmpty() ) {
             input = dependencies.get(dataset).withColumnRenamed(csvColumn, "value").as(Encoders.STRING());
         } else {
@@ -132,7 +131,6 @@ public class CsvDeriver implements Deriver, ProvidesAlias {
             LOG.debug("derive : schema = " + schema.treeString());
             result =  Contexts.getSparkSession().read().schema(schema).options(options).csv(input);
             LOG.debug("derive : result schema = " + result.schema().treeString());
-            result.show();
         } else {
             result =  Contexts.getSparkSession().read().options(options).csv(input);
         }
