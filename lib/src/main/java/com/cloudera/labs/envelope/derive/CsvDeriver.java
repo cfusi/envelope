@@ -124,7 +124,7 @@ public class CsvDeriver implements Deriver, ProvidesAlias {
         } else if ( !dataset.isEmpty() ) {
             input = dependencies.get(dataset).withColumnRenamed(csvColumn, "value").as(Encoders.STRING());
         } else {
-            throw new RuntimeException("If there are more than one dependencies, you need to specify the property " + DATASET_CONFIG);
+            throw new RuntimeException("If there is more than one dependency, you need to specify the property " + DATASET_CONFIG);
         }
 
         if (null != schema) {
