@@ -187,8 +187,16 @@ public class Runner {
           runBatch(independentNonStreamingSteps);
           
           streamingStep.stageProgress(raw);
-          
-          JavaRDD<Row> translated = streamingStep.translate(raw);
+
+          // FIX REPARTITION ERROR FOR KAFKA INPUT
+          /* JavaRDD<Row> translated = streamingStep.translate(raw);*/
+          JavaRDD<Row> translated = null;
+          if (streamingStep.doesRepartition()) {
+            int numPartitions = streamingStep.numPartitions();
+            translated = streamingStep.translate(raw).repartition(numPartitions);
+          } else {
+            translated = streamingStep.translate(raw);
+          }
           
           Dataset<Row> batchDF = Contexts.getSparkSession().createDataFrame(translated, streamSchema);
           streamingStep.setData(batchDF);

@@ -51,10 +51,12 @@ public class StreamingStep extends DataStep implements CanRecordProgress {
   @SuppressWarnings("rawtypes")
   public JavaDStream<?> getStream() throws Exception {
     JavaDStream stream = ((StreamInput)getInput()).getDStream();
-    
+
+    // FIX REPARTITION ERROR FOR KAFKA INPUT
+    /*
     if (doesRepartition()) {
       stream = repartition(stream);
-    }
+    } */
 
     return stream;
   }
@@ -98,8 +100,14 @@ public class StreamingStep extends DataStep implements CanRecordProgress {
     return copy;
   }
 
-  private boolean doesRepartition() {
+  // FIX REPARTITION ERROR FOR KAFKA INPUT
+  protected boolean doesRepartition() {
     return config.hasPath(REPARTITION_NUM_PARTITIONS_PROPERTY);
+  }
+
+  // FIX REPARTITION ERROR FOR KAFKA INPUT
+  protected int numPartitions() {
+    return config.getInt(REPARTITION_NUM_PARTITIONS_PROPERTY);
   }
 
   private JavaDStream<?> repartition(JavaDStream<?> stream) {
